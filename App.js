@@ -34,10 +34,7 @@ function App() {
           options={{ ...appOptions, title: "Contact" }}
         />
       </Stack.Navigator>
-      {/* <Text>Hello this is Abeeeeeeer's World =D</Text> */}
-      {/* <Home /> */}
-      {/* <CreateEmployee /> */}
-      {/* <Profile /> */}
+
       <StatusBar style="auto" />
     </View>
   );

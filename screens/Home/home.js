@@ -18,7 +18,7 @@ function Home(props) {
       name: "Abeer W.Rafati",
       job: "React-Native Developer",
       email: "rrtat@srta",
-      Phone: "7676",
+      Phone: "0786296903",
       img: "https://thispersondoesnotexist.com/image",
     },
     {
@@ -26,7 +26,7 @@ function Home(props) {
       name: "Abeer W.Rafati",
       job: "React-Native Developer",
       email: "rrtat@srta",
-      Phone: "7676",
+      Phone: "0786229903",
       img: "https://thispersondoesnotexist.com/image",
     },
     {
@@ -34,7 +34,7 @@ function Home(props) {
       name: "Abeer W.Rafati",
       job: "React-Native Developer",
       email: "rrtat@srta",
-      Phone: "7676",
+      Phone: "0786266903",
       img: "https://thispersondoesnotexist.com/image",
     },
   ];
@@ -44,7 +44,7 @@ function Home(props) {
       <FlatList
         data={data}
         renderItem={(item) => {
-          console.log(item);
+          console.log("from home", item);
           return (
             <Card
               style={styles.myCard}

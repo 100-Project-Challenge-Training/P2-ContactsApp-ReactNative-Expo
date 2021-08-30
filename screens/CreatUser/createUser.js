@@ -26,7 +26,7 @@ function CreateEmployee() {
     })();
   }, []);
 
-  const pickImageGallary = async () => {
+  const pickImageGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -37,7 +37,12 @@ function CreateEmployee() {
     console.log(result);
 
     if (!result.cancelled) {
-      setPic(result.uri);
+      let newResult = {
+        uri: result.uri,
+        type: `test/${result.uri.split(".")[1]}`,
+        name: `test.${result.uri.split(".")[1]}`,
+      };
+      upload(newResult);
     }
   };
   const pickImageCamera = async () => {
@@ -51,8 +56,31 @@ function CreateEmployee() {
     console.log(result);
 
     if (!result.cancelled) {
-      setPic(result.uri);
+      let newResult = {
+        uri: result.uri,
+        type: `test/${result.uri.split(".")[1]}`,
+        name: `test.${result.uri.split(".")[1]}`,
+      };
+      upload(newResult);
     }
+  };
+
+  const upload = (img) => {
+    const data = new FormData();
+    data.append("file", img);
+    data.append("upload_preset", "ContactsApp");
+    data.append("cloud_name", "abeerwr");
+
+    fetch("https://api.cloudinary.com/v1_1/abeerwr/image/upload", {
+      method: "post",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setPic(data.url);
+        setModal(false);
+      });
   };
 
   return (
@@ -92,11 +120,11 @@ function CreateEmployee() {
       />
       <Button
         style={styles.input}
-        icon="upload"
+        icon={Pic === "" ? "upload" : "check"}
         mode="contained"
         onPress={() => setModal(true)}
       >
-        Upload Your Image
+        Upload Image
       </Button>
       <Button
         style={styles.input}
@@ -120,7 +148,7 @@ function CreateEmployee() {
             <Button icon="camera" mode="contained" onPress={pickImageCamera}>
               Camera
             </Button>
-            <Button icon="image" mode="contained" onPress={pickImageGallary}>
+            <Button icon="image" mode="contained" onPress={pickImageGallery}>
               Glary
             </Button>
           </View>
