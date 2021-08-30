@@ -1,54 +1,53 @@
-import React from "react";
-import { StyleSheet, Text, View, Image, FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { Card, FAB } from "react-native-paper";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { styles } from "./style";
 function Home(props) {
-  const data = [
-    {
-      id: "1",
-      name: "Abeer W.Rafati",
-      job: "React-Native Developer",
-      email: "rrtat@srta",
-      phone: "0786226903",
-      img: "https://thispersondoesnotexist.com/image",
-    },
-    {
-      id: "2",
-      name: "Abeer W.Rafati",
-      job: "React-Native Developer",
-      email: "rrtat@srta",
-      Phone: "0786296903",
-      img: "https://thispersondoesnotexist.com/image",
-    },
-    {
-      id: "3",
-      name: "Abeer W.Rafati",
-      job: "React-Native Developer",
-      email: "rrtat@srta",
-      Phone: "0786229903",
-      img: "https://thispersondoesnotexist.com/image",
-    },
-    {
-      id: "4",
-      name: "Abeer W.Rafati",
-      job: "React-Native Developer",
-      email: "rrtat@srta",
-      Phone: "0786266903",
-      img: "https://thispersondoesnotexist.com/image",
-    },
-  ];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  function fetchData() {
+    fetch("https://contactsapp-reactnativ.herokuapp.com/")
+      .then((res) => res.json())
+      .then((newData) => {
+        console.log("from home uuseEEEEeefect fetch", newData);
+        setData(newData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        Alert.alert(`error in home fetching, ${err}`);
+      });
+  }
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <View style={styles.root}>
+      {console.log("hhnnnnnnnnnn", data)}
+      {/* {loading ? (
+        <ActivityIndicator size="large" />
+      ) : ( */}
       <FlatList
         data={data}
+        onRefresh={() => fetchData()}
+        refreshing={loading}
+        keyExtractor={(item) => item._id}
         renderItem={(item) => {
-          console.log("from home", item);
+          console.log("from flaaaaaatlist", item.item);
           return (
             <Card
               style={styles.myCard}
-              key={item.item.id}
+              key={item.item._id}
               onPress={() =>
                 props.navigation.navigate("Profile", { item: item.item })
               }
@@ -67,6 +66,7 @@ function Home(props) {
           );
         }}
       />
+      {/* )} */}
       <FAB
         onPress={() => props.navigation.navigate("CreateContact")}
         style={styles.fab}

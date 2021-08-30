@@ -4,14 +4,82 @@ import { TextInput, Button } from "react-native-paper";
 import { styles, theme } from "./style";
 import * as ImagePicker from "expo-image-picker";
 
-function CreateEmployee() {
-  const [Name, setName] = useState("");
-  const [Phone, setPhone] = useState("");
-  const [Email, setEmail] = useState("");
-  const [Salary, setSalary] = useState("");
-  const [Pic, setPic] = useState("");
+function CreateEmployee(props) {
+  function getDetails(type) {
+    if (props.route.params) {
+      const { name, phone, email, job, img } = props.route.params;
+      switch (type) {
+        case "name":
+          return name;
+        case "phone":
+          return phone;
+        case "email":
+          return email;
+        case "job":
+          return job;
+        case "img":
+          return img;
+      }
+    }
+    return "";
+  }
+  const [name, setName] = useState(getDetails("name"));
+  const [phone, setPhone] = useState(getDetails("phone"));
+  const [email, setEmail] = useState(getDetails("email"));
+  const [job, setJob] = useState(getDetails("job"));
+  const [img, setImg] = useState(getDetails("img"));
   const [modal, setModal] = useState(false);
 
+  const submitContactData = async () => {
+    await fetch("https://contactsapp-reactnativ.herokuapp.com/create", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        phone,
+        email,
+        img,
+        job,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("from fetching", data);
+        Alert.alert(`${data.name} is saved successfully`);
+        props.navigation.navigate("Home");
+      })
+      .catch((err) => {
+        Alert.alert(` error in posting contact ${err}`);
+      });
+  };
+
+  const update = async () => {
+    await fetch("https://contactsapp-reactnativ.herokuapp.com/update", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: props.route.params._id,
+        name,
+        phone,
+        email,
+        img,
+        job,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("from fetching", data);
+        Alert.alert(`${data.name} is updated `);
+        props.navigation.navigate("Home");
+      })
+      .catch((err) => {
+        Alert.alert(`error in updating ${err}`);
+      });
+  };
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
@@ -78,7 +146,7 @@ function CreateEmployee() {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        setPic(data.url);
+        setImg(data.url);
         setModal(false);
       });
   };
@@ -88,7 +156,7 @@ function CreateEmployee() {
       <TextInput
         style={styles.input}
         label="Name"
-        value={Name}
+        value={name}
         mode="outlined"
         theme={theme}
         onChangeText={(name) => setName(name)}
@@ -97,7 +165,7 @@ function CreateEmployee() {
       <TextInput
         style={styles.input}
         label="Phone"
-        value={Phone}
+        value={phone}
         mode="outlined"
         theme={theme}
         onChangeText={(phone) => setPhone(phone)}
@@ -105,35 +173,51 @@ function CreateEmployee() {
       <TextInput
         style={styles.input}
         label="Email"
-        value={Email}
+        value={email}
         mode="outlined"
         theme={theme}
         onChangeText={(email) => setEmail(email)}
       />
       <TextInput
         style={styles.input}
-        label="Salary"
-        value={Salary}
+        label="Job"
+        value={job}
         mode="outlined"
         theme={theme}
-        onChangeText={(salary) => setSalary(salary)}
+        onChangeText={(job) => setJob(job)}
       />
       <Button
         style={styles.input}
-        icon={Pic === "" ? "upload" : "check"}
+        icon={img === "" ? "upload" : "check"}
         mode="contained"
         onPress={() => setModal(true)}
       >
         Upload Image
       </Button>
-      <Button
-        style={styles.input}
-        mode="contained"
-        icon="content-save-outline"
-        onPress={() => setModal(false)}
-      >
-        Save
-      </Button>
+      {props.route.params ? (
+        <Button
+          style={styles.input}
+          mode="contained"
+          icon="content-save-outline"
+          onPress={() => {
+            update();
+          }}
+        >
+          update
+        </Button>
+      ) : (
+        <Button
+          style={styles.input}
+          mode="contained"
+          icon="content-save-outline"
+          onPress={() => {
+            submitContactData();
+          }}
+        >
+          Save
+        </Button>
+      )}
+
       <Modal
         animationType="slide"
         transparent={true}

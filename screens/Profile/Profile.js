@@ -1,13 +1,43 @@
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { StyleSheet, Text, View, Image, Linking, Platform } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Linking,
+  Platform,
+  Alert,
+} from "react-native";
 import { Title, Card, Button } from "react-native-paper";
 import { MaterialIcons, Entypo, FontAwesome } from "@expo/vector-icons";
 import { styles, theme } from "./style";
 
 function Profile(props) {
-  const { id, name, job, phone, email, img } = props.route.params.item;
-  console.log("props.route.params.item", props.route.params.item);
+  const { _id, name, job, phone, email, img } = props.route.params.item;
+  console.log("from profile", props.route.params.item);
+
+  function deleteData() {
+    fetch("https://contactsapp-reactnativ.herokuapp.com/delete", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: _id,
+      }),
+    })
+      .then((res) => res.json())
+      .then((deletedItem) => {
+        console.log(deletedItem);
+        Alert.alert(`${deletedItem.name} deleted`);
+        props.navigation.navigate("Home");
+      })
+      .catch((err) => {
+        Alert.alert(`error in deleting ${err}`);
+      });
+  }
+
   function call() {
     Platform.OS === "android"
       ? Linking.openURL(`tel:${phone}`)
@@ -48,7 +78,7 @@ function Profile(props) {
         <Card
           style={styles.card}
           onPress={() => {
-            Linking.openURL("mailto:someone@yoursite.com");
+            Linking.openURL(`mailto:${email}`);
           }}
         >
           <View style={styles.inCard}>
@@ -61,7 +91,16 @@ function Profile(props) {
         <Button
           icon="account-edit"
           mode="contained"
-          onPress={() => console.log("Pressed")}
+          onPress={() => {
+            props.navigation.navigate("CreateContact", {
+              _id,
+              name,
+              job,
+              phone,
+              email,
+              img,
+            });
+          }}
           theme={theme}
           style={{ padding: 8 }}
         >
@@ -70,7 +109,7 @@ function Profile(props) {
         <Button
           icon="delete-outline"
           mode="contained"
-          onPress={() => console.log("Pressed")}
+          onPress={() => deleteData()}
           theme={theme}
           style={{ padding: 8 }}
         >
