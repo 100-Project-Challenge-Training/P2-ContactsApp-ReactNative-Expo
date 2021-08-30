@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, Modal } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Modal, Alert } from "react-native";
 import { TextInput, Button } from "react-native-paper";
+import { styles, theme } from "./style";
+import * as ImagePicker from "expo-image-picker";
 
 function CreateEmployee() {
   const [Name, setName] = useState("");
@@ -9,6 +11,49 @@ function CreateEmployee() {
   const [Salary, setSalary] = useState("");
   const [Pic, setPic] = useState("");
   const [modal, setModal] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert(
+            "Sorry, we need camera roll permissions to make this work!"
+          );
+        }
+      }
+    })();
+  }, []);
+
+  const pickImageGallary = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setPic(result.uri);
+    }
+  };
+  const pickImageCamera = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setPic(result.uri);
+    }
+  };
 
   return (
     <View style={styles.root}>
@@ -72,18 +117,10 @@ function CreateEmployee() {
       >
         <View style={styles.modal}>
           <View style={styles.modalButtons}>
-            <Button
-              icon="camera"
-              mode="contained"
-              onPress={() => setModal(false)}
-            >
+            <Button icon="camera" mode="contained" onPress={pickImageCamera}>
               Camera
             </Button>
-            <Button
-              icon="image"
-              mode="contained"
-              onPress={() => setModal(false)}
-            >
+            <Button icon="image" mode="contained" onPress={pickImageGallary}>
               Glary
             </Button>
           </View>
@@ -94,27 +131,4 @@ function CreateEmployee() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  input: {
-    marginVertical: 5,
-    marginHorizontal: 10,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    padding: 20,
-    justifyContent: "space-around",
-  },
-  modal: {
-    position: "absolute",
-    bottom: 20,
-    width: "100%",
-
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-  },
-});
-
-const theme = { colors: { primary: "#3D19F7" } };
 export default CreateEmployee;
